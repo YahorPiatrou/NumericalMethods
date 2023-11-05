@@ -144,8 +144,8 @@ void Output_matrix(vector<vector<double>> A, vector<double> B)
 int main()
 {
 	vector<vector<double>> entered_matrix = { {0.14,0.24,-0.84},
-											  {1.07,-0.83,0.56} ,
-											{0.64,0.43,-0.38} };
+						{1.07,-0.83,0.56} ,
+						{0.64,0.43,-0.38} };
 	vector<double> extended_part = { 1.11,0.48,-0.83};
 	cout << "Entered matrix: \n";
 	Output_matrix(entered_matrix, extended_part);
