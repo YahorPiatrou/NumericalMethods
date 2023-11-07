@@ -1,18 +1,18 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <iomanip>
 
 using namespace std;
 
-bool operator / (const vector<double> first_vector, const vector<double> second_vector);
-vector<double> operator * (const vector<vector<double>> matrix, const vector <double> vector);
-bool checkProportionality(vector<vector<double>> A, vector<double> b);
-vector<double> Gauss_solution(vector<vector<double>> A, vector<double> B);
-double Finding_the_residual_vector(vector<vector<double>> A, vector<double> b, vector<double> answer);
-double Error_calculation(vector<double> x1, vector<double> x2);
-void Output_matrix(vector<vector<double>> A, vector<double> B);
+bool operator / (vector<double> first_vector,vector<double> second_vector);
+vector<double> operator * (vector<vector<double>> matrix, vector <double> vector);
+bool CheckProportionality(vector<vector<double>> A, vector<double> b);
+vector<double> GaussSolution(vector<vector<double>> A, vector<double> B);
+double FindingResidualVector(vector<vector<double>> A, vector<double> b, vector<double> answer);
+double ErrorCalculation(vector<double> x1, vector<double> x2);
+void OutputMatrix(vector<vector<double>> A, vector<double> B);
 
-bool operator / (const vector<double> first_vector, const vector<double> second_vector)
+bool operator / (vector<double> first_vector, vector<double> second_vector)
 {
 	int size = first_vector.size();
 	double ram = first_vector[0] / second_vector[0];
@@ -24,7 +24,7 @@ bool operator / (const vector<double> first_vector, const vector<double> second_
 	return true;
 }
 
-vector<double> operator * (const vector<vector<double>> matrix, const vector <double> vector_)
+vector<double> operator * (vector<vector<double>> matrix, vector <double> vector_)
 {
 	vector<double> result(matrix.size());
 	for (int i = 0; i < result.size(); i++) {
@@ -36,7 +36,7 @@ vector<double> operator * (const vector<vector<double>> matrix, const vector <do
 	return result;
 }
 
-bool checkProportionality(vector<vector<double>> A, vector<double> b)
+bool CheckProportionality(vector<vector<double>> A, vector<double> b)
 {
 	int n = A.size();
 	vector<vector<double>> A_b(n, vector<double>(n + 1, 0));
@@ -48,7 +48,7 @@ bool checkProportionality(vector<vector<double>> A, vector<double> b)
 				A_b[i][j] = A[i][j];
 		}
 	}
-	Output_matrix(A, b);
+	OutputMatrix(A, b);
 	bool proportional = false;
 	for (int i = 0; i < n - 1; i++)
 	{
@@ -62,7 +62,7 @@ bool checkProportionality(vector<vector<double>> A, vector<double> b)
 	return false;
 }
 
-vector<double> Gauss_solution(vector<vector<double>> A, vector<double> B)
+vector<double> GaussSolution(vector<vector<double>> A, vector<double> B)
 {
 	int n = A.size();
 	for (int i = 0; i < n; i++)
@@ -97,7 +97,7 @@ vector<double> Gauss_solution(vector<vector<double>> A, vector<double> B)
 	return res;
 }
 
-double Finding_the_residual_vector(vector<vector<double>> A, vector<double> b, vector<double> answer)
+double FindingResidualVector(vector<vector<double>> A, vector<double> b, vector<double> answer)
 {
 	double max_number = 0;
 	vector<double> inter_calculation(answer.size());
@@ -116,7 +116,7 @@ double Finding_the_residual_vector(vector<vector<double>> A, vector<double> b, v
 	return  max_number;
 }
 
-double Error_calculation(vector<double> x1, vector<double> x2)
+double ErrorCalculation(vector<double> x1, vector<double> x2)
 {
 	int n = x1.size();
 	double calc_error = 0;
@@ -131,7 +131,7 @@ double Error_calculation(vector<double> x1, vector<double> x2)
 	return calc_error;
 }
 
-void Output_matrix(vector<vector<double>> A, vector<double> B) 
+void OutputMatrix(vector<vector<double>> A, vector<double> B) 
 {
 	for (int i = 0; i < A.size(); i++)
 	{
@@ -143,23 +143,23 @@ void Output_matrix(vector<vector<double>> A, vector<double> B)
 
 int main()
 {
-	vector<vector<double>> entered_matrix = { {0.14,0.24,-0.84},
+	vector<vector<double>> enteredMatrix = { {0.14,0.24,-0.84},
 						{1.07,-0.83,0.56} ,
 						{0.64,0.43,-0.38} };
-	vector<double> extended_part = { 1.11,0.48,-0.83};
+	vector<double> extendedPart = { 1.11,0.48,-0.83};
 	cout << "Entered matrix: \n";
-	Output_matrix(entered_matrix, extended_part);
-	cout << "Answer: \n";
-	vector<double> result1 = Gauss_solution(entered_matrix, extended_part);
-	for (int i = 0; i < result1.size(); i++)
-		cout << "x" << i + 1 << "= " << result1[i] << " ";
-	double NormaofRV = Finding_the_residual_vector(entered_matrix, extended_part, result1);
-	cout << "\nNorma of residual vector: " << NormaofRV << endl;
-	vector<double> result2 = Gauss_solution(entered_matrix, entered_matrix * result1);
-	cout << "Second solution: \n";
-	for (int i = 0; i < result2.size(); i++)
-		cout << "x" << i + 1 << "= " << result2[i] << " ";
-	double error = Error_calculation(result1, result2);
-	cout << error;
+	OutputMatrix(enteredMatrix, extendedPart);
+	cout << "\nAnswer: \n";
+	vector<double> firstResult = GaussSolution(enteredMatrix, extendedPart);
+	for (int i = 0; i < firstResult.size(); i++)
+		cout << "x" << i + 1 << "= " << firstResult[i] << " ";
+	double normaRV = FindingResidualVector(enteredMatrix, extendedPart, firstResult);
+	cout << "\n\nNorma of residual vector: " << normaRV << endl;
+	vector<double> secondResult = GaussSolution(enteredMatrix, enteredMatrix * firstResult);
+	cout << "\nSecond solution: \n";
+	for (int i = 0; i < secondResult.size(); i++)
+		cout << "x" << i + 1 << "= " << secondResult[i] << " ";
+	double error = ErrorCalculation(firstResult, secondResult);
+	cout << "\n\nRelative error estimate: " << error << endl;
 	return 0;
 }
