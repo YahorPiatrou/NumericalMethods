@@ -15,9 +15,9 @@ void OutputMatrix(vector<vector<double>> A, vector<double> B);
 bool operator / (vector<double> first_vector, vector<double> second_vector)
 {
 	int size = first_vector.size();
-	double ram = first_vector[0] / second_vector[0];
+	double proportionalityNumber = first_vector[0] / second_vector[0];
 	for (int i = 1; i < size; i++)
-		if (ram == first_vector[i] / second_vector[i])
+		if (proportionalityNumber == first_vector[i] / second_vector[i])
 			continue;
 		else
 			return false;
@@ -99,36 +99,36 @@ vector<double> GaussSolution(vector<vector<double>> A, vector<double> B)
 
 double FindingResidualVector(vector<vector<double>> A, vector<double> b, vector<double> answer)
 {
-	double max_number = 0;
-	vector<double> inter_calculation(answer.size());
+	double maxNumber = 0;
+	vector<double> errorVector(answer.size());
 	for (int i = 0; i < answer.size(); i++)
 	{
 		for (int j = 0; j < answer.size(); j++)
-			inter_calculation[i] += A[i][j] * answer[j];
-		inter_calculation[i] -= b[i];
+			errorVector[i] += A[i][j] * answer[j];
+		errorVector[i] -= b[i];
 	}
-	max_number = abs(inter_calculation[0]);
-	for (int i = 1; i < inter_calculation.size(); i++)
+	maxNumber = abs(errorVector[0]);
+	for (int i = 1; i < errorVector.size(); i++)
 	{
-		if (max_number < abs(inter_calculation[i]))
-			max_number = abs(inter_calculation[i]);
+		if (maxNumber < abs(errorVector[i]))
+			maxNumber = abs(errorVector[i]);
 	}
-	return  max_number;
+	return  maxNumber;
 }
 
 double ErrorCalculation(vector<double> x1, vector<double> x2)
 {
 	int n = x1.size();
-	double calc_error = 0;
-	double max1 = 0, max2 = 0;
+	double calculatedError = 0;
+	double firstMaxNumber = 0, secondMaxNumber = 0;
 	for (int i = 0; i < n; i++) {
-		if (x2[i] - x1[i] > max1)
-			max1 = x2[i] - x1[i];
-		if (x1[i] > max2)
-			max2 = x1[i];
+		if (x2[i] - x1[i] > firstMaxNumber)
+			firstMaxNumber = x2[i] - x1[i];
+		if (x1[i] > secondMaxNumber)
+			secondMaxNumber = x1[i];
 	}
-	calc_error = max1 / max2;
-	return calc_error;
+	calculatedError = firstMaxNumber / secondMaxNumber;
+	return calculatedError;
 }
 
 void OutputMatrix(vector<vector<double>> A, vector<double> B) 
@@ -144,8 +144,8 @@ void OutputMatrix(vector<vector<double>> A, vector<double> B)
 int main()
 {
 	vector<vector<double>> enteredMatrix = { {0.14,0.24,-0.84},
-						{1.07,-0.83,0.56} ,
-						{0.64,0.43,-0.38} };
+											  {1.07,-0.83,0.56} ,
+											{0.64,0.43,-0.38} };
 	vector<double> extendedPart = { 1.11,0.48,-0.83};
 	cout << "Entered matrix: \n";
 	OutputMatrix(enteredMatrix, extendedPart);
@@ -154,12 +154,12 @@ int main()
 	for (int i = 0; i < firstResult.size(); i++)
 		cout << "x" << i + 1 << "= " << firstResult[i] << " ";
 	double normaRV = FindingResidualVector(enteredMatrix, extendedPart, firstResult);
-	cout << "\n\nNorma of residual vector: " << normaRV << endl;
+	cout << "\n\nNorma of residual vector: \n" << normaRV << endl;
 	vector<double> secondResult = GaussSolution(enteredMatrix, enteredMatrix * firstResult);
 	cout << "\nSecond solution: \n";
 	for (int i = 0; i < secondResult.size(); i++)
 		cout << "x" << i + 1 << "= " << secondResult[i] << " ";
-	double error = ErrorCalculation(firstResult, secondResult);
-	cout << "\n\nRelative error estimate: " << error << endl;
+	double calculatedError = ErrorCalculation(firstResult, secondResult);
+	cout << "\n\nRelative error estimate: " << calculatedError << endl;
 	return 0;
 }
