@@ -4,57 +4,59 @@
 
 using namespace std;
 
-bool operator / (vector<double> first_vector,vector<double> second_vector);
-vector<double> operator * (vector<vector<double>> matrix, vector <double> vector);
-bool CheckProportionality(vector<vector<double>> A, vector<double> b);
-vector<double> GaussSolution(vector<vector<double>> A, vector<double> B);
-double FindingResidualVector(vector<vector<double>> A, vector<double> b, vector<double> answer);
-double ErrorCalculation(vector<double> x1, vector<double> x2);
-void OutputMatrix(vector<vector<double>> A, vector<double> B);
+void OutputMatrixInConsole(vector<vector<double>> A, vector<double> b);
 
-bool operator / (vector<double> first_vector, vector<double> second_vector)
+enum UserChoice
 {
-	int size = first_vector.size();
-	double proportionalityNumber = first_vector[0] / second_vector[0];
-	for (int i = 1; i < size; i++)
-		if (proportionalityNumber == first_vector[i] / second_vector[i])
-			continue;
-		else
-			return false;
-	return true;
+	manualEntryMatrix = 1,
+	defaultMatrix = 2,
+};
+
+
+bool CheckRowProportionality(vector<double> firstVector, vector<double> secondVector) 
+{
+    int size = firstVector.size();
+    double ram = firstVector[0] / secondVector[0];
+    for (int i = 1; i < size; i++) {
+        if (ram == firstVector[i] / secondVector[i])
+            continue;
+        else
+            return false;
+    }
+    return true;
 }
 
-vector<double> operator * (vector<vector<double>> matrix, vector <double> vector_)
+vector<double> MultiplyMatrixVector(vector<vector<double>> matrix, vector<double> vector_)
 {
-	vector<double> result(matrix.size());
-	for (int i = 0; i < result.size(); i++) {
-		result[i] = 0;
-		for (int j = 0; j < result.size(); j++) {
-			result[i] += matrix[i][j] * vector_[j];
+	vector<double> resultVector(matrix.size());
+	for (int i = 0; i < resultVector.size(); i++) {
+		resultVector[i] = 0;
+		for (int j = 0; j < resultVector.size(); j++) {
+			resultVector[i] += matrix[i][j] * vector_[j];
 		}
 	}
-	return result;
+	return resultVector;
 }
 
 bool CheckProportionality(vector<vector<double>> A, vector<double> b)
 {
-	int n = A.size();
-	vector<vector<double>> A_b(n, vector<double>(n + 1, 0));
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n + 1; j++) {
-			if (j == n)
+	int vectorSize = A.size();
+	vector<vector<double>> A_b(vectorSize, vector<double>(vectorSize + 1, 0));
+	for (int i = 0; i < vectorSize; i++) {
+		for (int j = 0; j < vectorSize + 1; j++) {
+			if (j == vectorSize)
 				A_b[i][j] = b[i];
 			else
 				A_b[i][j] = A[i][j];
 		}
 	}
-	OutputMatrix(A, b);
+	OutputMatrixInConsole(A, b);
 	bool proportional = false;
-	for (int i = 0; i < n - 1; i++)
+	for (int i = 0; i < vectorSize - 1; i++)
 	{
-		for (int j = i + 1; j < n; j++)
+		for (int j = i + 1; j < vectorSize; j++)
 		{
-			proportional = A_b[i] / A_b[j];
+			proportional = CheckRowProportionality(A_b[i],A_b[j]);
 			if (proportional)
 				return true;
 		}
@@ -62,104 +64,150 @@ bool CheckProportionality(vector<vector<double>> A, vector<double> b)
 	return false;
 }
 
-vector<double> GaussSolution(vector<vector<double>> A, vector<double> B)
+vector<double> SolveGaussMethod(vector<vector<double>> A, vector<double> b)
 {
-	int n = A.size();
-	for (int i = 0; i < n; i++)
+	int vectorSize = A.size();
+	for (int i = 0; i < vectorSize; i++)
 	{
 		int k = i;
-		for (int j = i + 1; j < n; j++)
+		for (int j = i + 1; j < vectorSize; j++)
 		{
 			if (abs(A[j][i]) > abs(A[k][i]))
 				k = j;
 		}
 		swap(A[i], A[k]);
-		swap(B[i], B[k]);
+		swap(b[i], b[k]);
 		double div = A[i][i];
-		for (int j = i; j < n; j++)
+		for (int j = i; j < vectorSize; j++)
 			A[i][j] /= div;
-		B[i] /= div;
-		for (int j = i + 1; j < n; j++)
+		b[i] /= div;
+		for (int j = i + 1; j < vectorSize; j++)
 		{
 			double mult = A[j][i];
-			for (int k = i; k < n; k++)
+			for (int k = i; k < vectorSize; k++)
 				A[j][k] -= mult * A[i][k];
-			B[j] -= mult * B[i];
+			b[j] -= mult * b[i];
 		}
 	}
-	vector<double> res(n);
-	for (int i = n - 1; i >= 0; i--)
+	vector<double> vectorOfRoots(vectorSize);
+	for (int i = vectorSize - 1; i >= 0; i--)
 	{
-		res[i] = B[i];
-		for (int j = i + 1; j < n; j++)
-			res[i] -= A[i][j] * res[j];
+		vectorOfRoots[i] = b[i];
+		for (int j = i + 1; j < vectorSize; j++)
+			vectorOfRoots[i] -= A[i][j] * vectorOfRoots[j];
 	}
-	return res;
+	return vectorOfRoots;
 }
 
-double FindingResidualVector(vector<vector<double>> A, vector<double> b, vector<double> answer)
+double FindMaxInRV(vector<vector<double>> A, vector<double> b, vector<double> firstRoots)
 {
-	double maxNumber = 0;
-	vector<double> errorVector(answer.size());
-	for (int i = 0; i < answer.size(); i++)
+	vector<double> vectorCalculationDiff(firstRoots.size());
+	double maxInVCD = 0;
+	for (int i = 0; i < firstRoots.size(); i++)
 	{
-		for (int j = 0; j < answer.size(); j++)
-			errorVector[i] += A[i][j] * answer[j];
-		errorVector[i] -= b[i];
+		for (int j = 0; j < firstRoots.size(); j++)
+			vectorCalculationDiff[i] += A[i][j] * firstRoots[j];
+		vectorCalculationDiff[i] -= b[i];
 	}
-	maxNumber = abs(errorVector[0]);
-	for (int i = 1; i < errorVector.size(); i++)
+	maxInVCD = abs(vectorCalculationDiff[0]);
+	for (int i = 1; i < vectorCalculationDiff.size(); i++)
 	{
-		if (maxNumber < abs(errorVector[i]))
-			maxNumber = abs(errorVector[i]);
+		if (maxInVCD < abs(vectorCalculationDiff[i]))
+			maxInVCD = abs(vectorCalculationDiff[i]);
 	}
-	return  maxNumber;
+	return  maxInVCD;
 }
 
-double ErrorCalculation(vector<double> x1, vector<double> x2)
+double CalculateError(vector<double> firstRoots, vector<double> x2)
 {
-	int n = x1.size();
-	double calculatedError = 0;
-	double firstMaxNumber = 0, secondMaxNumber = 0;
-	for (int i = 0; i < n; i++) {
-		if (x2[i] - x1[i] > firstMaxNumber)
-			firstMaxNumber = x2[i] - x1[i];
-		if (x1[i] > secondMaxNumber)
-			secondMaxNumber = x1[i];
+	int vectorSize = firstRoots.size();
+	double calcError = 0;
+	double max1 = 0, max2 = 0;
+	for (int i = 0; i < vectorSize; i++) 
+	{
+		if (x2[i] - firstRoots[i] > max1)
+			max1 = x2[i] - firstRoots[i];
+		if (firstRoots[i] > max2)
+			max2 = firstRoots[i];
 	}
-	calculatedError = firstMaxNumber / secondMaxNumber;
-	return calculatedError;
+	calcError = max1 / max2;
+	return calcError;
 }
 
-void OutputMatrix(vector<vector<double>> A, vector<double> B) 
+void OutputMatrixInConsole(vector<vector<double>> A, vector<double> b)
 {
 	for (int i = 0; i < A.size(); i++)
 	{
 		for (int j = 0; j < A.size(); j++)
 			cout << A[i][j] << setw(11);
-		cout << setw(3) << "| " << B[i] << endl;
+		cout << setw(3) << "| " << b[i] << endl;
 	}
 }
 
 int main()
 {
-	vector<vector<double>> enteredMatrix = { {0.14,0.24,-0.84},
-											  {1.07,-0.83,0.56} ,
-											{0.64,0.43,-0.38} };
-	vector<double> extendedPart = { 1.11,0.48,-0.83};
-	cout << "Entered matrix: \n";
-	OutputMatrix(enteredMatrix, extendedPart);
+	vector<vector<double>> A;
+	vector<double> b;
+	int userChoice;
+	cout << "how do you want to initialize the matrix?\n"
+		<< (int)UserChoice::manualEntryMatrix << " - enter the matrix manually\n"
+		<< (int)UserChoice::defaultMatrix << " - use an already defined matrix\n"
+		<< "any other value terminates the program!\n\nyour answer: ";
+	cin >> userChoice;
+
+	switch ((UserChoice)userChoice)
+	{
+	case UserChoice::manualEntryMatrix:
+	{
+		cout << "enter matrix order: ";
+		int matrixSize;
+		cin >> matrixSize;
+		A.assign(matrixSize, vector<double>(matrixSize));
+		b.resize(matrixSize);
+		for (int i = 0; i < matrixSize; i++)
+		{
+			for (int j = 0; j < matrixSize; j++)
+			{
+				printf("enter element with index A[%d][%d]: ", i + 1, j + 1);
+				cin >> A[i][j];
+			}
+		}
+		for (int i = 0; i < matrixSize; i++)
+		{
+			printf("enter element b[%d]: ", i + 1);
+			cin >> b[i];
+		}
+		break;
+	}
+
+	case UserChoice::defaultMatrix:
+	{
+		A = { {0.14,0.24,-0.84},
+			{1.07,-0.83,0.56},
+			{0.64,0.43,-0.38} };
+		b = { 1.11,0.48,-0.83 };
+		break;
+	}
+
+	default:
+		cout << "the program has ended\n";
+		return 0;
+	}
+
+	cout << "\nEntered matrix: \n";
+	OutputMatrixInConsole(A, b);
 	cout << "\nAnswer: \n";
-	vector<double> firstResult = GaussSolution(enteredMatrix, extendedPart);
-	for (int i = 0; i < firstResult.size(); i++)
-		cout << "x" << i + 1 << "= " << firstResult[i] << " ";
-	double normaRV = FindingResidualVector(enteredMatrix, extendedPart, firstResult);
-	cout << "\n\nNorma of residual vector: \n" << normaRV << endl;
-	vector<double> secondResult = GaussSolution(enteredMatrix, enteredMatrix * firstResult);
+	vector<double> firstRoots = SolveGaussMethod(A, b);
+	for (int i = 0; i < firstRoots.size(); i++)
+		printf("x%d= %f  ", i + 1, firstRoots[i]);
+	double maxNormaOfRV = FindMaxInRV(A, b, firstRoots);
+	cout << "\n\nNorma of residual vector: \n" << maxNormaOfRV << endl;
+	vector<double> result2 = SolveGaussMethod(A, MultiplyMatrixVector(A,firstRoots));
 	cout << "\nSecond solution: \n";
-	for (int i = 0; i < secondResult.size(); i++)
-		cout << "x" << i + 1 << "= " << secondResult[i] << " ";
-	double calculatedError = ErrorCalculation(firstResult, secondResult);
-	cout << "\n\nRelative error estimate: " << calculatedError << endl;
+	for (int i = 0; i < result2.size(); i++)
+		printf("x%d= %f ", i + 1, result2[i]);
+	cout << "\n\nCalculation error: \n";
+	double calculationError = CalculateError(firstRoots, result2);
+	cout << calculationError << endl;
 	return 0;
 }
