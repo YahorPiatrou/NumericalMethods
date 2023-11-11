@@ -12,12 +12,12 @@ enum UserChoice
 	defaultMatrix = 2,
 };
 
-
 bool CheckRowProportionality(vector<double> firstVector, vector<double> secondVector) 
 {
     int size = firstVector.size();
     double ram = firstVector[0] / secondVector[0];
-    for (int i = 1; i < size; i++) {
+    for (int i = 1; i < size; i++) 
+	{
         if (ram == firstVector[i] / secondVector[i])
             continue;
         else
@@ -29,11 +29,11 @@ bool CheckRowProportionality(vector<double> firstVector, vector<double> secondVe
 vector<double> MultiplyMatrixVector(vector<vector<double>> matrix, vector<double> vector_)
 {
 	vector<double> resultVector(matrix.size());
-	for (int i = 0; i < resultVector.size(); i++) {
+	for (int i = 0; i < resultVector.size(); i++) 
+	{
 		resultVector[i] = 0;
-		for (int j = 0; j < resultVector.size(); j++) {
+		for (int j = 0; j < resultVector.size(); j++) 
 			resultVector[i] += matrix[i][j] * vector_[j];
-		}
 	}
 	return resultVector;
 }
@@ -42,15 +42,16 @@ bool CheckProportionality(vector<vector<double>> A, vector<double> b)
 {
 	int vectorSize = A.size();
 	vector<vector<double>> A_b(vectorSize, vector<double>(vectorSize + 1, 0));
-	for (int i = 0; i < vectorSize; i++) {
-		for (int j = 0; j < vectorSize + 1; j++) {
+	for (int i = 0; i < vectorSize; i++) 
+	{
+		for (int j = 0; j < vectorSize + 1; j++) 
+		{
 			if (j == vectorSize)
 				A_b[i][j] = b[i];
 			else
 				A_b[i][j] = A[i][j];
 		}
 	}
-	OutputMatrixInConsole(A, b);
 	bool proportional = false;
 	for (int i = 0; i < vectorSize - 1; i++)
 	{
@@ -196,6 +197,11 @@ int main()
 
 	cout << "\nEntered matrix: \n";
 	OutputMatrixInConsole(A, b);
+	if (CheckProportionality(A, b))
+	{
+		cout << "rows are proportional, the roots of the system cannot be calculated";
+		return 0;
+	}
 	cout << "\nAnswer: \n";
 	vector<double> firstRoots = SolveGaussMethod(A, b);
 	for (int i = 0; i < firstRoots.size(); i++)
