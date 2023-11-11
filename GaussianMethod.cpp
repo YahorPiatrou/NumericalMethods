@@ -12,13 +12,13 @@ enum UserChoice
 	defaultMatrix = 2,
 };
 
-bool CheckRowProportionality(vector<double> firstVector, vector<double> secondVector) 
+bool CheckRowProportionality(vector<double> firstRows, vector<double> secondRows) 
 {
-    int size = firstVector.size();
-    double ram = firstVector[0] / secondVector[0];
+    int size = firstRows.size();
+    double ram = firstRows[0] / secondRows[0];
     for (int i = 1; i < size; i++) 
 	{
-        if (ram == firstVector[i] / secondVector[i])
+        if (ram == firstRows[i] / secondRows[i])
             continue;
         else
             return false;
@@ -40,6 +40,7 @@ vector<double> MultiplyMatrixVector(vector<vector<double>> matrix, vector<double
 
 bool CheckProportionality(vector<vector<double>> A, vector<double> b)
 {
+	bool isProportional = false;
 	int vectorSize = A.size();
 	vector<vector<double>> A_b(vectorSize, vector<double>(vectorSize + 1, 0));
 	for (int i = 0; i < vectorSize; i++) 
@@ -52,13 +53,12 @@ bool CheckProportionality(vector<vector<double>> A, vector<double> b)
 				A_b[i][j] = A[i][j];
 		}
 	}
-	bool proportional = false;
 	for (int i = 0; i < vectorSize - 1; i++)
 	{
 		for (int j = i + 1; j < vectorSize; j++)
 		{
-			proportional = CheckRowProportionality(A_b[i],A_b[j]);
-			if (proportional)
+			isProportional = CheckRowProportionality(A_b[i],A_b[j]);
+			if (isProportional)
 				return true;
 		}
 	}
@@ -195,24 +195,24 @@ int main()
 		return 0;
 	}
 
-	cout << "\nEntered matrix: \n";
+	cout << "\nentered matrix: \n";
 	OutputMatrixInConsole(A, b);
 	if (CheckProportionality(A, b))
 	{
 		cout << "rows are proportional, the roots of the system cannot be calculated";
 		return 0;
 	}
-	cout << "\nAnswer: \n";
+	cout << "\nanswer: \n";
 	vector<double> firstRoots = SolveGaussMethod(A, b);
 	for (int i = 0; i < firstRoots.size(); i++)
 		printf("x%d= %f  ", i + 1, firstRoots[i]);
 	double maxNormaOfRV = FindMaxInRV(A, b, firstRoots);
-	cout << "\n\nNorma of residual vector: \n" << maxNormaOfRV << endl;
+	cout << "\n\nnorma of residual vector: \n" << maxNormaOfRV << endl;
 	vector<double> result2 = SolveGaussMethod(A, MultiplyMatrixVector(A,firstRoots));
-	cout << "\nSecond solution: \n";
+	cout << "\nsecond solution: \n";
 	for (int i = 0; i < result2.size(); i++)
 		printf("x%d= %f ", i + 1, result2[i]);
-	cout << "\n\nCalculation error: \n";
+	cout << "\n\ncalculation error: \n";
 	double calculationError = CalculateError(firstRoots, result2);
 	cout << calculationError << endl;
 	return 0;
