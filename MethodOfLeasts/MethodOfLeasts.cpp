@@ -72,7 +72,7 @@ vector <double> SolveLSMApproximation(vector <double> experimentalValuesOfX, vec
 	for (int k = 1; k <= 2 * polynomialDegree; k++) 
 		vectorOfSumElements[k - 1] = SumVectorElements(RaiseElementsOfVectorToPow(experimentalValuesOfX, k));
 	vector <vector<double>> coefficientMatrix(polynomialDegree + 1, vector<double>(polynomialDegree + 1, 0.0)); 
-	vector<double> vectorOfMultiplyCoord(polynomialDegree + 1, 0.0); 
+	vector<double> vectorOfMultiplyParameters(polynomialDegree + 1, 0.0); 
 	for (int i = 0; i <= polynomialDegree; i++) 
 	{
 		for (int j = 0; j <= polynomialDegree; j++) 
@@ -85,9 +85,9 @@ vector <double> SolveLSMApproximation(vector <double> experimentalValuesOfX, vec
 			else
 				coefficientMatrix[i][j] = numberOfExperimentalPoints;
 		}
-		vectorOfMultiplyCoord[i] = MultiplyParametersOfVectors(experimentalValuesOfY, RaiseElementsOfVectorToPow(experimentalValuesOfX, i));
+		vectorOfMultiplyParameters[i] = MultiplyParametersOfVectors(experimentalValuesOfY, RaiseElementsOfVectorToPow(experimentalValuesOfX, i));
 	}
-	vector<double> equationCoefficients = SolveGaussMethod(coefficientMatrix, vectorOfMultiplyCoord);
+	vector<double> equationCoefficients = SolveGaussMethod(coefficientMatrix, vectorOfMultiplyParameters);
 	return equationCoefficients;
 }
 
