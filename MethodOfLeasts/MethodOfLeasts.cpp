@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <iomanip>
 #include <vector>
 #include <math.h>
@@ -68,25 +68,26 @@ vector <double> SolveLSMApproximation(vector <double> experimentalValuesOfX, vec
 {
 	int numberOfExperimentalPoints = experimentalValuesOfX.size(); 
 	int polynomialDegree = 1; 
-	vector <double> POWERX(2 * polynomialDegree, 0.0); 
+	vector <double> vectorOfSumElements(2 * polynomialDegree, 0.0); 
 	for (int k = 1; k <= 2 * polynomialDegree; k++) 
-		POWERX[k - 1] = SumVectorElements(RaiseElementsOfVectorToPow(experimentalValuesOfX, k));
-	vector <vector<double>> SUMX(polynomialDegree + 1, vector<double>(polynomialDegree + 1, 0.0)); 
-	vector<double> PRAW(polynomialDegree + 1, 0.0); 
-	for (int i = 0; i <= polynomialDegree; i++) {
+		vectorOfSumElements[k - 1] = SumVectorElements(RaiseElementsOfVectorToPow(experimentalValuesOfX, k));
+	vector <vector<double>> coefficientMatrix(polynomialDegree + 1, vector<double>(polynomialDegree + 1, 0.0)); 
+	vector<double> vectorOfMultiplyCoord(polynomialDegree + 1, 0.0); 
+	for (int i = 0; i <= polynomialDegree; i++) 
+	{
 		for (int j = 0; j <= polynomialDegree; j++) 
 		{
 			if (i != 0 || j != 0) 
 			{
 				int k = i + j - 1;
-				SUMX[i][j] = POWERX[k];
+				coefficientMatrix[i][j] = vectorOfSumElements[k];
 			}
 			else
-				SUMX[i][j] = numberOfExperimentalPoints;
+				coefficientMatrix[i][j] = numberOfExperimentalPoints;
 		}
-		PRAW[i] = MultiplyParametersOfVectors(experimentalValuesOfY, RaiseElementsOfVectorToPow(experimentalValuesOfX, i));
+		vectorOfMultiplyCoord[i] = MultiplyParametersOfVectors(experimentalValuesOfY, RaiseElementsOfVectorToPow(experimentalValuesOfX, i));
 	}
-	vector<double> equationCoefficients = SolveGaussMethod(SUMX, PRAW);
+	vector<double> equationCoefficients = SolveGaussMethod(coefficientMatrix, vectorOfMultiplyCoord);
 	return equationCoefficients;
 }
 
@@ -112,7 +113,7 @@ int main()
 	vector <double> experimentalValuesOfY = { 0.0141,0.0281,0.0562,0.1125,0.2250 }; // values of P in our equation
 	vector <double> squaredValuesOfX = RaiseElementsOfVectorToPow(experimentalValuesOfX,2); // we do equation P=a+bx, where x = v^2. reduction to a linear form of a function
 	vector <double> equationCoefficients = SolveLSMApproximation(squaredValuesOfX, experimentalValuesOfY);
-	cout << "equation:P=a+bv^2\nFound equation coefficients: \n";
+	cout << "equation: P=a+bv^2\nFound equation coefficients: \n";
 	cout << "a = " << equationCoefficients[0] << ", b = " << equationCoefficients[1];
 	double standardDeviation = CalculateStandardDeviation(experimentalValuesOfX, experimentalValuesOfY, equationCoefficients);
 	cout << "\n\nStandard deviation of equations: \n" << standardDeviation;
