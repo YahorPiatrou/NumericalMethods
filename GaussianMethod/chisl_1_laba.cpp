@@ -4,8 +4,6 @@
 
 using namespace std;
 
-void OutMatrixInConsole(vector<vector<double>> A, vector<double> b);
-
 enum UserChoiceAboutSolMethod
 {
 	GaussMethod = 1,
@@ -18,10 +16,22 @@ enum UserChoiceAboutInputMethod
 	defaultMatrix = 2,
 };
 
-bool CheckRowProportionality(vector<double> firstRows, vector<double> secondRows) // checking rows for proportionality
+template<typename T,typename U>
+void OutMatrixInConsole(vector<vector<T>> A, vector<U> b) // output matrix to console
+{
+	for (int i = 0; i < A.size(); i++)
+	{
+		for (int j = 0; j < A.size(); j++)
+			cout << A[i][j] << setw(11);
+		cout << setw(3) << "| " << b[i] << endl;
+	}
+}
+
+template<typename T,typename U>
+bool CheckRowProportionality(vector<T> firstRows, vector<U> secondRows) // checking rows for proportionality
 {
 	int rowSize = firstRows.size();
-	double proportionalityFactor = firstRows[0] / secondRows[0];
+	T proportionalityFactor = firstRows[0] / secondRows[0];
 	for (int i = 1; i < rowSize; i++)
 	{
 		if (proportionalityFactor == firstRows[i] / secondRows[i])
@@ -32,9 +42,10 @@ bool CheckRowProportionality(vector<double> firstRows, vector<double> secondRows
 	return true;
 }
 
-vector<double> MultiplyMatrixVector(vector<vector<double>> matrixOfElements, vector<double> vectorOfElements)
+template<typename T,typename U>
+vector<T> MultiplyMatrixVector(vector<vector<T>> matrixOfElements, vector<U> vectorOfElements)
 {
-	vector<double> resultVector(matrixOfElements.size());
+	vector<T> resultVector(matrixOfElements.size());
 	for (int i = 0; i < resultVector.size(); i++)
 	{
 		resultVector[i] = 0;
@@ -44,11 +55,12 @@ vector<double> MultiplyMatrixVector(vector<vector<double>> matrixOfElements, vec
 	return resultVector;
 }
 
-bool CheckProportionality(vector<vector<double>> A, vector<double> b) // checking a matrix for row proportionality
+template<typename T,typename U>
+bool CheckProportionality(vector<vector<T>> A, vector<U> b) // checking a matrix for row proportionality
 {
 	bool isProportional = false;
 	int vectorSize = A.size();
-	vector<vector<double>> A_b(vectorSize, vector<double>(vectorSize + 1, 0));
+	vector<vector<T>> A_b(vectorSize, vector<T>(vectorSize + 1, 0));
 	for (int i = 0; i < vectorSize; i++)
 	{
 		for (int j = 0; j < vectorSize + 1; j++)
@@ -71,7 +83,8 @@ bool CheckProportionality(vector<vector<double>> A, vector<double> b) // checkin
 	return false;
 }
 
-vector<double> SolveGaussMethod(vector<vector<double>> A, vector<double> b)
+template<typename T,typename U>
+vector<T> SolveGaussMethod(vector<vector<T>> A, vector<U> b)
 {
 	int vectorSize = A.size();
 	for (int i = 0; i < vectorSize; i++)
@@ -84,19 +97,19 @@ vector<double> SolveGaussMethod(vector<vector<double>> A, vector<double> b)
 		}
 		swap(A[i], A[k]);
 		swap(b[i], b[k]);
-		double div = A[i][i];
+		T div = A[i][i];
 		for (int j = i; j < vectorSize; j++)
 			A[i][j] /= div;
 		b[i] /= div;
 		for (int j = i + 1; j < vectorSize; j++)
 		{
-			double mult = A[j][i];
+			T mult = A[j][i];
 			for (int k = i; k < vectorSize; k++)
 				A[j][k] -= mult * A[i][k];
 			b[j] -= mult * b[i];
 		}
 	}
-	vector<double> vectorOfRoots(vectorSize);
+	vector<T> vectorOfRoots(vectorSize);
 	for (int i = vectorSize - 1; i >= 0; i--)
 	{
 		vectorOfRoots[i] = b[i];
@@ -106,10 +119,11 @@ vector<double> SolveGaussMethod(vector<vector<double>> A, vector<double> b)
 	return vectorOfRoots;
 }
 
-double FindMaxInRV(vector<vector<double>> A, vector<double> b, vector<double> firstRoots) // finding the residual vector and its norm
+template<typename T,typename U>
+T FindMaxInRV(vector<vector<T>> A, vector<U> b, vector<T> firstRoots) // finding the residual vector and its norm
 {
-	vector<double> vectorCalculationDiff(firstRoots.size());
-	double maxInVCD = 0;
+	vector<T> vectorCalculationDiff(firstRoots.size());
+	T maxInVCD = 0;
 	for (int i = 0; i < firstRoots.size(); i++)
 	{
 		for (int j = 0; j < firstRoots.size(); j++)
@@ -125,10 +139,11 @@ double FindMaxInRV(vector<vector<double>> A, vector<double> b, vector<double> fi
 	return  maxInVCD;
 }
 
-double CalculateError(vector<double> firstRoots, vector<double> secondRoots) // calculation of relative error
+template<typename T>
+T CalculateError(vector<T> firstRoots, vector<T> secondRoots) // calculation of relative error
 {
 	int vectorSize = firstRoots.size();
-	double calcError = 0, maxDiff = 0, maxRoots = 0;
+	T calcError = 0, maxDiff = 0, maxRoots = 0;
 	for (int i = 0; i < vectorSize; i++)
 	{
 		if (secondRoots[i] - firstRoots[i] > maxDiff)
@@ -140,22 +155,13 @@ double CalculateError(vector<double> firstRoots, vector<double> secondRoots) // 
 	return calcError;
 }
 
-void OutMatrixInConsole(vector<vector<double>> A, vector<double> b) // output matrix to console
-{
-	for (int i = 0; i < A.size(); i++)
-	{
-		for (int j = 0; j < A.size(); j++)
-			cout << A[i][j] << setw(11);
-		cout << setw(3) << "| " << b[i] << endl;
-	}
-}
-
-vector<double> SolveSystemWithLDLFactorization(vector<vector<double>> A, vector<double> b)
+template<typename T,typename U>
+vector<T> SolveSystemWithLDLFactorization(vector<vector<T>> A, vector<U> b)
 {
 	int sizeOfMatrix = A.size();
-	vector<double> diagonalMatrix(sizeOfMatrix), vectorOfRoots(sizeOfMatrix), y(sizeOfMatrix), z(sizeOfMatrix);
-	vector<vector<double>> lowerTriangularMatrix(sizeOfMatrix, vector<double>(sizeOfMatrix, 0));
-	vector<vector<double>> upperTriangularMatrix(lowerTriangularMatrix);
+	vector<T> diagonalMatrix(sizeOfMatrix), vectorOfRoots(sizeOfMatrix), y(sizeOfMatrix), z(sizeOfMatrix);
+	vector<vector<T>> lowerTriangularMatrix(sizeOfMatrix, vector<T>(sizeOfMatrix, 0));
+	vector<vector<T>> upperTriangularMatrix(lowerTriangularMatrix);
 	for (int i = 0; i < sizeOfMatrix; i++) // make a unit diagonal in matrices
 		lowerTriangularMatrix[i][i] = upperTriangularMatrix[i][i] = 1;
 	for (int j = 0; j < sizeOfMatrix; j++)
@@ -174,7 +180,7 @@ vector<double> SolveSystemWithLDLFactorization(vector<vector<double>> A, vector<
 	}
 	for (int i = 0; i < sizeOfMatrix; i++)
 	{
-		double sumofMultElements = 0;
+		T sumofMultElements = 0;
 		for (int j = 0; j < i; j++)
 			sumofMultElements += lowerTriangularMatrix[i][j] * y[j];
 		y[i] = b[i] - sumofMultElements;
@@ -182,7 +188,7 @@ vector<double> SolveSystemWithLDLFactorization(vector<vector<double>> A, vector<
 	}
 	for (int i = sizeOfMatrix - 1; i >= 0; i--)
 	{
-		double sumofMultElements = 0;
+		T sumofMultElements = 0;
 		for (int j = sizeOfMatrix - 1; j > i; j--)
 			sumofMultElements += upperTriangularMatrix[i][j] * vectorOfRoots[j];
 		vectorOfRoots[i] = z[i] - sumofMultElements;
